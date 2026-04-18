@@ -1,0 +1,32 @@
+{
+  "name": "@useorgx/orgx-local-shell",
+  "version": "0.1.0-alpha.0",
+  "description": "OrgX local shell. Tauri 2 desktop app that renders the same surfaces as useorgx.com using @useorgx/orgx-ui-kit + @useorgx/orgx-data, with the plugin peers running as system sidecars.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "@useorgx/orgx-ui-kit": "github:useorgx/orgx-ui-kit",
+    "@useorgx/orgx-data": "github:useorgx/orgx-data",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.4.0",
+    "vite": "^5.4.0"
+  }
+}

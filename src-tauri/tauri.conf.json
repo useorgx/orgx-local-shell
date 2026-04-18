@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OrgX Shell",
+  "version": "0.1.0-alpha.0",
+  "identifier": "com.useorgx.shell",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "OrgX",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: https:; connect-src 'self' https://useorgx.com wss://useorgx.com; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    },
+    "trayIcon": {
+      "iconPath": "icons/tray.png",
+      "tooltip": "OrgX — live run count, next attention, quick launcher",
+      "menuOnLeftClick": false
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "appimage", "msi"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Sovereign Execution desktop shell",
+    "longDescription": "Renders the same surfaces as useorgx.com (Command, Mission Control, Activity, Daily Brief, Parallel Runs) in a Tauri 2 wrapper. Bundles plugin peers as system sidecars so dispatches survive browser closes."
+  }
+}

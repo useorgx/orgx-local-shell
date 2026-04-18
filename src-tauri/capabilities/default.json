@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/@tauri-apps/cli/schema.json",
+  "identifier": "default",
+  "description": "Default capability set for OrgX local shell",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        { "name": "orgx-claude-code-peer", "cmd": "orgx-claude-code-peer", "args": true },
+        { "name": "orgx-codex-peer", "cmd": "orgx-codex-peer", "args": true },
+        { "name": "orgx-opencode-plugin", "cmd": "orgx-opencode-plugin", "args": true }
+      ]
+    }
+  ]
+}
