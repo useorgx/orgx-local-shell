@@ -10,8 +10,8 @@ export npm_config_fund=false
 node --version
 npm --version
 
-# This repo intentionally has no lockfile. Avoid creating one in Codex setup.
-npm install --package-lock=false
+# Resolve dependencies from the checked-in lockfile.
+npm ci
 
 # The shell consumes these packages from GitHub. Build local temp copies so
 # Codex cloud has the dist/type outputs even before npm packages are published.
