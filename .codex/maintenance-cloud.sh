@@ -7,7 +7,7 @@ export CI=1
 export npm_config_audit=false
 export npm_config_fund=false
 
-npm install --package-lock=false
+npm ci
 
 tmp_dir="${TMPDIR:-/tmp}/orgx-local-shell-cloud-deps"
 rm -rf "$tmp_dir"
