@@ -8,7 +8,7 @@ For people reviewing local agent work, this alpha Tauri 2 desktop shell presents
 
 ![OrgX shell browser frontend showing three synthetic runs: documentation work in progress, a result awaiting review, and a queued link check](docs/images/runs-demo.png)
 
-Captured from the current frontend with a local synthetic API fixture ([capture details](docs/images/preview-provenance.md)). [Open the live local frontend](http://127.0.0.1:5173/) after the quickstart. The [public OrgX demo](https://useorgx.com/live/demo) is a separate hosted experience. GitHub displays this screenshot; it cannot embed the desktop app. This capture verifies frontend rendering, not native packaging or peer execution.
+Captured from the current frontend with a local synthetic API fixture ([capture details](docs/images/preview-provenance.md)). [Open the live local frontend](http://127.0.0.1:5173/) after the quickstart. The [public OrgX demo](https://useorgx.com/live/demo) is a separate hosted experience. GitHub displays this screenshot; it cannot embed the desktop app. This capture verifies frontend rendering, not native packaging or peer execution. The form's current local-only credential wording is inaccurate; the actual transmission boundary is explained in [For agents](#for-agents).
 
 ## Quickstart
 
@@ -47,7 +47,7 @@ The screenshot uses a browser-side synthetic fixture API; there is no shipped `-
 
 The shell is an application, not an MCP server or a new agent CLI. Discover the supported npm scripts in [package.json](package.json), tabs and request shapes in [src/App.tsx](src/App.tsx), and native commands in [src-tauri/src/main.rs](src-tauri/src/main.rs). Use the respective peer plugins' supported setup for agent integration; do not invent a shell MCP endpoint.
 
-The configuration is stored in `localStorage`. The key is sent as `Authorization: Bearer …` to the configured API and is passed to native peer processes when a person starts them; it is not confined to the machine or stored in an OS keychain. Keep credentials out of prompts, fixtures, logs and screenshots. Permissions belong to the configured API and peer, not to a visible UI control. The Runs request currently omits a workspace query parameter; the API/key's scope remains authoritative.
+The configuration is stored in `localStorage`. The key is sent as `Authorization: Bearer …` to the configured API and is passed to native peer processes when a person starts them; it is not confined to the machine or stored in an OS keychain. Keep credentials out of prompts, fixtures, logs and screenshots. Permissions belong to the configured API and peer, not to a visible UI control. The Runs request currently omits a workspace query parameter; the API/key's scope remains authoritative. The checked-in native CSP permits connections to `useorgx.com`; a custom base URL that works in a browser can still be outside that native allowlist.
 
 Scope read workflows to the intended workspace and inspect server results. **Reviews** can POST a judgment resolution; peer launch starts local processes. Treat those as authorized actions, not passive reads. The Rust launcher passes `ORGX_API_KEY` and `ORGX_WORKSPACE_ID`, but a successful process spawn or UI badge does not prove gateway admission or task completion.
 
