@@ -22,6 +22,10 @@ bash .codex/maintenance-cloud.sh
 
 ## Verification
 
+Choose checks for the files and behavior changed. The commands below cover code
+changes; documentation-only edits need a diff and reference review, not a full
+build. Keep required CI checks in place and report any checks that could not run.
+
 ```bash
 npm run type-check
 npm run build
