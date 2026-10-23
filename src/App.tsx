@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { initialPeerStates, PEERS, startPendingPeers, type PeerLaunchStates } from './peerStartup';
 
 import {
   ParallelRunBoard,
@@ -28,7 +29,9 @@ export default function App() {
   const [config, setConfig] = useState<Config | null>(null);
   const [shellVersion, setShellVersion] = useState<string>('');
   const [tab, setTab] = useState<Tab>('runs');
-  const [peersStarted, setPeersStarted] = useState(false);
+  const [peerStates, setPeerStates] = useState(initialPeerStates);
+  const [startingPeers, setStartingPeers] = useState(false);
+  const launchInProgress = useRef(false);
 
   useEffect(() => {
     try {
@@ -42,19 +45,20 @@ export default function App() {
       .catch(() => setShellVersion('dev'));
   }, []);
 
-  async function startPeers(pluginIds: string[], cfg: Config) {
-    for (const id of pluginIds) {
-      try {
-        await invoke('start_peer', {
-          pluginId: id,
-          apiKey: cfg.apiKey,
-          workspaceId: cfg.workspaceId,
-        });
-      } catch (err) {
-        console.warn(`peer ${id} failed to start`, err);
-      }
+  async function startPeers(cfg: Config) {
+    if (launchInProgress.current) return;
+    launchInProgress.current = true;
+    setStartingPeers(true);
+    try {
+      await startPendingPeers(peerStates, (id) => invoke('start_peer', {
+        pluginId: id,
+        apiKey: cfg.apiKey,
+        workspaceId: cfg.workspaceId,
+      }), setPeerStates);
+    } finally {
+      launchInProgress.current = false;
+      setStartingPeers(false);
     }
-    setPeersStarted(true);
   }
 
   if (!config) {
@@ -74,17 +78,9 @@ export default function App() {
         tab={tab}
         setTab={setTab}
         shellVersion={shellVersion}
-        peersStarted={peersStarted}
-        startPeers={() =>
-          startPeers(
-            [
-              '@useorgx/claude-code-plugin',
-              '@useorgx/codex-plugin',
-              '@useorgx/orgx-opencode-plugin',
-            ],
-            config
-          )
-        }
+        peerStates={peerStates}
+        startingPeers={startingPeers}
+        startPeers={() => startPeers(config)}
       />
       <main style={{ flex: 1, overflowY: 'auto' }}>
         <TabContent tab={tab} config={config} />
@@ -97,13 +93,15 @@ function Header({
   tab,
   setTab,
   shellVersion,
-  peersStarted,
+  peerStates,
+  startingPeers,
   startPeers,
 }: {
   tab: Tab;
   setTab: (t: Tab) => void;
   shellVersion: string;
-  peersStarted: boolean;
+  peerStates: PeerLaunchStates;
+  startingPeers: boolean;
   startPeers: () => void;
 }) {
   const tabs: Array<{ id: Tab; label: string }> = [
@@ -113,11 +111,14 @@ function Header({
     { id: 'vault', label: 'Vault' },
     { id: 'audit', label: 'Audit' },
   ];
+  const allSpawned = PEERS.every(({ id }) => peerStates[id] === 'started');
+  const hasFailures = PEERS.some(({ id }) => peerStates[id] === 'failed');
   return (
     <header
       style={{
         display: 'flex',
         alignItems: 'center',
+        flexWrap: 'wrap',
         gap: 12,
         padding: '12px 20px',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -166,17 +167,28 @@ function Header({
           borderRadius: 999,
           fontSize: 12,
           fontWeight: 600,
-          cursor: peersStarted ? 'default' : 'pointer',
-          background: peersStarted ? 'rgba(191,255,0,0.18)' : '#BFFF00',
-          color: peersStarted ? 'rgba(191,255,0,0.85)' : 'black',
-          border: peersStarted
+          cursor: startingPeers || allSpawned ? 'default' : 'pointer',
+          background: allSpawned ? 'rgba(191,255,0,0.18)' : '#BFFF00',
+          color: allSpawned ? 'rgba(191,255,0,0.85)' : 'black',
+          border: allSpawned
             ? '1px solid rgba(191,255,0,0.3)'
             : '1px solid transparent',
         }}
-        disabled={peersStarted}
+        disabled={startingPeers || allSpawned}
       >
-        {peersStarted ? '● Peers running' : 'Start plugin peers'}
+        {startingPeers ? 'Starting peers…' : allSpawned ? 'Processes started' : hasFailures ? 'Retry failed peers' : 'Start plugin peers'}
       </button>
+      <div role="status" aria-label="Plugin peer launch status" style={{ flexBasis: '100%', fontSize: 12 }}>
+        <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px', margin: 0, padding: 0, listStyle: 'none' }}>
+          {PEERS.map(({ id, name }) => (
+            <li key={id} style={{ color: peerStates[id] === 'failed' ? '#ff9b9b' : 'rgba(255,255,255,0.7)' }}>
+              {name}: {peerStates[id] === 'idle' ? 'Not started' : peerStates[id] === 'starting' ? 'Starting…' : peerStates[id] === 'started' ? 'Process started' : 'Failed to start'}
+            </li>
+          ))}
+        </ul>
+        {hasFailures && <p style={{ margin: '8px 0 0' }}>Check that the peer executable is installed and the native desktop runtime is available, then retry.</p>}
+        <p style={{ margin: '8px 0 0', color: 'rgba(255,255,255,0.5)' }}>Launch status only. Peer readiness and ongoing health have not been checked.</p>
+      </div>
     </header>
   );
 }
