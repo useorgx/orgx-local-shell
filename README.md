@@ -31,14 +31,14 @@ For the native desktop app, install the [Tauri 2 platform prerequisites](https:/
 2. Open **Runs** to read the returned run state, then **Receipts** to inspect recorded outcomes and provider usage.
 3. Compare a receipt's `run_id` and outcome with the underlying OrgX work record. Open **Reviews** for judgments that need a person.
 
-**Success:** the API returns records for your authorized workspace and the UI shows the corresponding runs/receipts. An empty list is valid for an empty workspace; it is not proof that a connection succeeded. Confirm a real API response before concluding there is no work. A "shipped" outcome in a receipt or a "Peers running" badge is not independent verification of delivery or peer health.
+**Success:** the API returns records for your authorized workspace and the UI shows the corresponding runs/receipts. An empty list is valid for an empty workspace; it is not proof that a connection succeeded. Confirm a real API response before concluding there is no work. A "shipped" outcome in a receipt is not independent verification of delivery. Each peer now shows **Not started**, **Starting**, **Process started**, or **Failed to start**. The native acknowledgement proves spawn only; readiness and ongoing health remain unchecked. Retry starts only failed or unstarted peers.
 
 The screenshot uses a browser-side synthetic fixture API; there is no shipped `--demo` flag. Entering real credentials is not needed to reproduce a fixture capture.
 
 ## Docs and troubleshooting
 
 - [Frontend tabs, configuration and requests](src/App.tsx), [native commands](src-tauri/src/main.rs), and [native capabilities](src-tauri/capabilities/default.json) are the shipped implementation references.
-- Development checks: `npm run type-check` and `npm run build`. Browser preview after build: `npm run preview -- --host 127.0.0.1`.
+- Development checks: `npm test` (Node 22), `npm run type-check` and `npm run build`. Browser preview after build: `npm run preview -- --host 127.0.0.1`.
 - Blank lists can reflect an empty response or a failed request; the current tab implementation does not surface every fetch error. Check browser network status, workspace access, base URL and API auth. Some shared surfaces currently lack their expected Tailwind styling; the preview shows the shipped alpha layout.
 - The browser build labels its version `dev` when Tauri IPC is unavailable. **Start plugin peers** needs the native runtime and the expected executables; use the relevant peer's logs and OrgX state to verify it.
 - The configured native window is desktop-sized (minimum 960 × 600). Rust/Tauri platform packaging and signed installers were not verified by a frontend build.
